@@ -2,217 +2,837 @@
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Latva-Mantilan hunajatila</title>
 <meta name="description" content="Latva-Mantilan hunajatila Jalasjärvellä. Aitoa monikukkahunajaa, jota on tuotettu samalla tilalla lähes sata vuotta. Janne ja Katja Latva-Mantilan perhetila.">
-<link rel="icon" type="image/svg+xml" href="images/logo-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Crimson+Text:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root {
+  --amber:     #c8892a;
+  --amber-dk:  #9e6a18;
+  --amber-lt:  #e8c888;
+  --ink:       #1e1208;
+  --ink-mid:   #3a2a14;
+  --paper:     #f8f0dc;
+  --paper-dk:  #eddfc5;
+  --sage:      #6b7a58;
+  --sage-lt:   #8fa07a;
+  --wax:       #faf4e6;
+  --display: 'Playfair Display', Georgia, serif;
+  --body:    'Crimson Text', Georgia, serif;
+  --max: 1180px;
+  --gap: clamp(2rem, 5vw, 5rem);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--body);
+  font-size: clamp(17px, 1.15vw, 20px);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; width: 100%; object-fit: cover; }
+a { color: inherit; text-decoration: none; }
+
+/* ============================================================
+   I18N
+============================================================ */
+.fi, .sv, .en { display: none; }
+body[data-lang="fi"] .fi { display: block; }
+body[data-lang="sv"] .sv { display: block; }
+body[data-lang="en"] .en { display: block; }
+.fi-i, .sv-i, .en-i { display: none; }
+body[data-lang="fi"] .fi-i { display: inline; }
+body[data-lang="sv"] .sv-i { display: inline; }
+body[data-lang="en"] .en-i { display: inline; }
+
+/* ============================================================
+   NAV
+============================================================ */
+#nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.5rem, 4vw, 3.5rem);
+  height: 64px;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+#nav.scrolled {
+  background: var(--ink);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+.nav-logo {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--paper);
+  text-transform: uppercase;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--paper);
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; }
+.lang-btn {
+  background: none;
+  border: 1px solid rgba(248,240,220,0.4);
+  color: var(--paper);
+  font-family: var(--body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.lang-btn:hover, .lang-btn.active { border-color: var(--amber); background: var(--amber); color: var(--ink); }
+.lang-group { display: flex; gap: 0.3rem; }
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; flex-direction: column; gap: 5px; }
+.nav-toggle span { display: block; width: 24px; height: 2px; background: var(--paper); }
+.nav-mobile { display: none; }
+@media (max-width: 800px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: flex; }
+  .nav-mobile {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--ink);
+    z-index: 99;
+    padding: 6rem 2rem 2rem;
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+  }
+  .nav-mobile.open { transform: translateX(0); }
+  .nav-mobile ul { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+  .nav-mobile a { font-family: var(--display); font-size: 1.4rem; color: var(--paper); font-style: italic; }
+  .lang-group { margin-top: 2rem; }
+}
+
+/* ============================================================
+   HERO
+============================================================ */
+#hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+}
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(30,18,8,0.55) 0%, rgba(30,18,8,0.2) 50%, rgba(30,18,8,0.75) 100%);
+  z-index: 1;
+}
+#hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 300px 300px;
+  z-index: 2;
+}
+.hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: clamp(3.5rem, 7vw, 7rem);
+  text-align: center;
+  color: var(--paper);
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(200,137,42,0.55);
+  padding: 6px 22px;
+  letter-spacing: 0.22em;
+  font-size: 0.68rem;
+  font-family: var(--body);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--amber-lt);
+  margin-bottom: 1.2rem;
+}
+.hero-badge::before, .hero-badge::after { content: '◆'; font-size: 0.5rem; margin: 0 0.7em; color: var(--amber); }
+.hero-eyebrow {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: var(--amber-lt);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.03em;
+}
+.hero-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(2.6rem, 6vw, 6rem);
+  line-height: 1.05;
+  color: var(--paper);
+  max-width: 820px;
+  margin-bottom: 1.4rem;
+}
+.hero-sub {
+  font-family: var(--body);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  color: rgba(248,240,220,0.78);
+  max-width: 500px;
+  margin-bottom: 2.4rem;
+  font-style: italic;
+}
+.hero-cta {
+  display: inline-block;
+  background: var(--amber);
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 14px 38px;
+  border: 2px solid var(--amber);
+  transition: background 0.25s, color 0.25s;
+}
+.hero-cta:hover { background: transparent; color: var(--amber-lt); }
+.hero-scroll {
+  position: absolute;
+  bottom: 1.8rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgba(248,240,220,0.45);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.hero-scroll::after {
+  content: '';
+  width: 1px;
+  height: 40px;
+  background: rgba(200,137,42,0.5);
+  animation: sLine 1.9s ease-in-out infinite;
+}
+@keyframes sLine { 0%,100%{opacity:0;transform:scaleY(0.3)} 50%{opacity:1;transform:scaleY(1)} }
+
+/* ============================================================
+   LAYOUT UTILITIES
+============================================================ */
+.container { max-width: var(--max); margin: 0 auto; padding: 0 clamp(1.5rem, 5vw, 3.5rem); }
+.section-pad { padding: var(--gap) 0; }
+.section-rule { width: 56px; height: 2px; background: var(--amber); margin: 0 auto 1.2rem; }
+.section-label {
+  font-family: var(--body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--amber-dk);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(1.9rem, 3.5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.section-lead {
+  font-size: clamp(1rem, 1.3vw, 1.15rem);
+  color: var(--ink-mid);
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto 3rem;
+  font-style: italic;
+}
+.ornament { text-align: center; color: var(--amber); letter-spacing: 0.6em; font-size: 0.7rem; margin: 1.2rem 0; }
+
+/* ============================================================
+   HERITAGE STRIP
+============================================================ */
+#vuosirengas {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4rem 0;
+}
+.vuosirengas-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2rem, 6vw, 7rem);
+  flex-wrap: wrap;
+}
+.stamp-hex {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stamp-hex::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--amber);
+  clip-path: polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
+}
+.stamp-hex-inner { position: relative; z-index: 1; text-align: center; }
+.stamp-year { font-family: var(--display); font-size: 2.8rem; font-weight: 700; line-height: 1; color: var(--ink); }
+.stamp-sub { font-family: var(--body); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink); opacity: 0.78; }
+.heritage-facts { display: flex; flex-direction: column; gap: 1.6rem; max-width: 500px; }
+.heritage-fact { display: flex; gap: 1.2rem; align-items: flex-start; }
+.fact-num { font-family: var(--display); font-size: 2rem; font-weight: 700; color: var(--amber); line-height: 1; min-width: 60px; }
+.fact-text { font-family: var(--body); font-size: 0.88rem; color: rgba(248,240,220,0.72); line-height: 1.55; }
+.fact-text strong { display: block; font-size: 0.95rem; font-weight: 600; color: var(--paper); margin-bottom: 0.15rem; }
+
+/* ============================================================
+   TARINA
+============================================================ */
+#tarina { background: var(--paper); padding: var(--gap) 0; }
+.tarina-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+.tarina-img-wrap { position: relative; }
+.tarina-img { aspect-ratio: 4/5; width: 100%; object-fit: cover; }
+.tarina-img-wrap::before, .tarina-img-wrap::after {
+  content: '';
+  position: absolute;
+  width: 40px; height: 40px;
+  border-color: var(--amber);
+  border-style: solid;
+  z-index: 2;
+  opacity: 0.65;
+}
+.tarina-img-wrap::before { top: -10px; left: -10px; border-width: 2px 0 0 2px; }
+.tarina-img-wrap::after  { bottom: -10px; right: -10px; border-width: 0 2px 2px 0; }
+.tarina-text .section-title { text-align: left; }
+.tarina-text .section-label { text-align: left; }
+.tarina-text .section-rule { margin: 0 0 1.2rem; }
+.tarina-body { font-size: clamp(1rem, 1.2vw, 1.1rem); color: var(--ink-mid); margin-top: 1.4rem; line-height: 1.8; }
+.tarina-body p + p { margin-top: 1em; }
+.tarina-quote {
+  display: block;
+  margin-top: 2rem;
+  padding-left: 1.2rem;
+  border-left: 3px solid var(--amber);
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--ink);
+  line-height: 1.6;
+}
+@media (max-width: 720px) {
+  .tarina-grid { grid-template-columns: 1fr; }
+  .tarina-img { aspect-ratio: 16/9; }
+}
+
+/* ============================================================
+   MEHILAINEN VUOSI (signature)
+============================================================ */
+#mehilainen-vuosi { background: var(--ink); color: var(--paper); padding: var(--gap) 0; }
+#mehilainen-vuosi .section-title { color: var(--paper); }
+#mehilainen-vuosi .section-label { color: var(--amber); }
+.vuosi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px solid rgba(200,137,42,0.22);
+  margin-top: 3rem;
+}
+.vuosi-card {
+  padding: 1.5rem 1.1rem;
+  border-right: 1px solid rgba(200,137,42,0.18);
+  border-bottom: 1px solid rgba(200,137,42,0.18);
+}
+.vuosi-card:nth-child(4n) { border-right: none; }
+.vuosi-card:nth-child(n+9) { border-bottom: none; }
+.vuosi-month { font-family: var(--body); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.4rem; }
+.vuosi-icon { font-size: 1.3rem; margin-bottom: 0.4rem; }
+.vuosi-desc { font-family: var(--body); font-size: 0.8rem; color: rgba(248,240,220,0.65); line-height: 1.5; }
+@media (max-width: 640px) {
+  .vuosi-grid { grid-template-columns: repeat(2, 1fr); }
+  .vuosi-card:nth-child(4n) { border-right: 1px solid rgba(200,137,42,0.18); }
+  .vuosi-card:nth-child(2n) { border-right: none; }
+  .vuosi-card:nth-child(n+11) { border-bottom: none; }
+  .vuosi-card:nth-child(9),.vuosi-card:nth-child(10) { border-bottom: 1px solid rgba(200,137,42,0.18); }
+}
+
+/* ============================================================
+   TUOTTEET
+============================================================ */
+#tuotteet { background: var(--paper-dk); padding: var(--gap) 0; }
+.tuotteet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem; }
+.tuote-card {
+  background: var(--paper);
+  border: 1.5px dashed rgba(200,137,42,0.45);
+  padding: 2.4rem 1.8rem;
+  text-align: center;
+  position: relative;
+}
+.tuote-card::before {
+  content: '✦';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  background: var(--paper-dk);
+  color: var(--amber);
+  font-size: 0.85rem;
+  padding: 0 8px;
+}
+.tuote-icon { font-size: 2.2rem; margin-bottom: 1rem; }
+.tuote-name { font-family: var(--display); font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 0.8rem; }
+.tuote-desc { font-family: var(--body); font-size: 0.9rem; color: var(--ink-mid); line-height: 1.65; }
+.tuote-tag {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 3px 12px;
+  border: 1px solid var(--amber);
+  font-family: var(--body);
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--amber-dk);
+}
+@media (max-width: 700px) { .tuotteet-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .tuotteet-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   GALLERIA
+============================================================ */
+#galleria { background: var(--paper); padding: var(--gap) 0; }
+.galleria-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 260px 260px;
+  gap: 0;
+  margin-top: 3rem;
+  overflow: hidden;
+}
+.gal-cell { overflow: hidden; }
+.gal-cell:nth-child(1) { grid-column: span 2; }
+.gal-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.gal-cell:hover img { transform: scale(1.04); }
+@media (max-width: 700px) {
+  .galleria-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+  .gal-cell:nth-child(1) { grid-column: span 2; }
+  .gal-cell img { height: 200px; }
+}
+
+/* ============================================================
+   YHTEYSTIEDOT
+============================================================ */
+#yhteystiedot { background: var(--ink); color: var(--paper); padding: var(--gap) 0; }
+#yhteystiedot .section-title { color: var(--paper); }
+#yhteystiedot .section-label { color: var(--amber); }
+.contact-inner { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); align-items: start; margin-top: 3rem; }
+.contact-info h3 { font-family: var(--display); font-size: 1.3rem; font-weight: 700; color: var(--paper); margin-bottom: 1.4rem; font-style: italic; }
+.contact-row { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+.contact-icon { font-size: 1rem; color: var(--amber); flex-shrink: 0; margin-top: 3px; }
+.contact-detail { font-family: var(--body); font-size: 0.95rem; color: rgba(248,240,220,0.72); line-height: 1.6; }
+.contact-detail strong { display: block; color: var(--paper); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.2rem; }
+.order-panel { background: rgba(200,137,42,0.1); border: 1px solid rgba(200,137,42,0.25); padding: 2.2rem; }
+.order-panel h3 { font-family: var(--display); font-size: 1.3rem; font-weight: 700; color: var(--amber-lt); margin-bottom: 1rem; font-style: italic; }
+.order-panel p { font-family: var(--body); font-size: 0.95rem; color: rgba(248,240,220,0.7); line-height: 1.7; margin-bottom: 1.4rem; }
+.order-cta {
+  display: inline-block;
+  background: var(--amber);
+  color: var(--ink);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  transition: background 0.25s;
+}
+.order-cta:hover { background: var(--amber-lt); }
+@media (max-width: 680px) { .contact-inner { grid-template-columns: 1fr; } }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer { background: #0e0a04; color: rgba(248,240,220,0.42); padding: 3rem 0; text-align: center; }
+.footer-logo { font-family: var(--display); font-size: 1.2rem; font-weight: 700; color: var(--amber); letter-spacing: 0.08em; margin-bottom: 0.8rem; }
+footer p { font-family: var(--body); font-size: 0.78rem; letter-spacing: 0.06em; line-height: 2; }
+footer a { color: rgba(200,137,42,0.6); transition: color 0.2s; }
+footer a:hover { color: var(--amber); }
+.footer-div { color: var(--amber); opacity: 0.28; margin: 1rem 0; letter-spacing: 0.6em; font-size: 0.5rem; }
+
+/* ============================================================
+   FADE-IN
+============================================================ */
+.fade-up { opacity: 0; transform: translateY(28px); transition: opacity 0.75s ease, transform 0.75s ease; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+</style>
 </head>
-<body data-title-fi="Latva-Mantilan hunajatila · Aitoa monikukkahunajaa, Jalasjärvi" data-title-en="Latva-Mantilan hunajatila · Genuine Multiflower Honey, Jalasjärvi, Finland" data-title-sv="Latva-Mantilan hunajatila · Äkta blomsterhonung, Jalasjärvi">
+<body data-lang="fi">
 
-<a class="visually-hidden" href="#main">Siirry sisältöön / Skip to content</a>
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">Latva-Mantila</a>
+  <ul class="nav-links">
+    <li><a href="#tarina"><span class="fi-i">Tarina</span><span class="sv-i">Historia</span><span class="en-i">Story</span></a></li>
+    <li><a href="#mehilainen-vuosi"><span class="fi-i">Mehiläiset</span><span class="sv-i">Bina</span><span class="en-i">Bees</span></a></li>
+    <li><a href="#tuotteet"><span class="fi-i">Tuotteet</span><span class="sv-i">Produkter</span><span class="en-i">Products</span></a></li>
+    <li><a href="#yhteystiedot"><span class="fi-i">Yhteystiedot</span><span class="sv-i">Kontakt</span><span class="en-i">Contact</span></a></li>
+  </ul>
+  <div class="lang-group">
+    <button class="lang-btn active" onclick="setLang('fi')">FI</button>
+    <button class="lang-btn" onclick="setLang('sv')">SV</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
 
-<header class="site-header">
-  <div class="container">
-    <a href="index.html" class="brand">
-      <span class="brand-mark" aria-hidden="true"><img src="images/logo-mark.svg" alt="" width="44" height="44"></span>
-      <span>Latva-Mantila<span class="brand-sub" data-fi="Hunajatila · Jalasjärvi" data-en="Honey Farm · Jalasjärvi" data-sv="Honungsgård · Jalasjärvi">Hunajatila · Jalasjärvi</span></span>
+<div class="nav-mobile" id="navMobile">
+  <ul>
+    <li><a href="#tarina" onclick="closeMobile()"><span class="fi-i">Tarina</span><span class="sv-i">Historia</span><span class="en-i">Story</span></a></li>
+    <li><a href="#mehilainen-vuosi" onclick="closeMobile()"><span class="fi-i">Mehiläiset</span><span class="sv-i">Bina</span><span class="en-i">Bees</span></a></li>
+    <li><a href="#tuotteet" onclick="closeMobile()"><span class="fi-i">Tuotteet</span><span class="sv-i">Produkter</span><span class="en-i">Products</span></a></li>
+    <li><a href="#yhteystiedot" onclick="closeMobile()"><span class="fi-i">Yhteystiedot</span><span class="sv-i">Kontakt</span><span class="en-i">Contact</span></a></li>
+  </ul>
+  <div class="lang-group">
+    <button class="lang-btn" onclick="setLang('fi');closeMobile()">FI</button>
+    <button class="lang-btn" onclick="setLang('sv');closeMobile()">SV</button>
+    <button class="lang-btn" onclick="setLang('en');closeMobile()">EN</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <img class="hero-img" src="images/hero-beekeeper.jpg" alt="Mehiläishoitaja kukkaniityllä" onerror="this.style.display='none'">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="fi-i">Jalasjärvi, Etelä-Pohjanmaa</span>
+      <span class="sv-i">Jalasjärvi, Södra Österbotten</span>
+      <span class="en-i">Jalasjärvi, South Ostrobothnia</span>
+    </div>
+    <div class="fi hero-eyebrow">Mehiläistila vuodesta 1920-luvulta</div>
+    <div class="sv hero-eyebrow">Bigård sedan 1920-talet</div>
+    <div class="en hero-eyebrow">Beekeeping farm since the 1920s</div>
+    <h1 class="hero-title">Latva-Mantilan<br>hunajatila</h1>
+    <div class="fi hero-sub">Aitoa suomalaista monikukkahunajaa sukupolvelta toiselle.</div>
+    <div class="sv hero-sub">Äkta finsk blomsterhonung, förd vidare från generation till generation.</div>
+    <div class="en hero-sub">Genuine Finnish multi-flower honey, passed down through generations.</div>
+    <a href="#tuotteet" class="hero-cta">
+      <span class="fi-i">Tutustu hunajaan</span>
+      <span class="sv-i">Utforska honungen</span>
+      <span class="en-i">Discover our honey</span>
     </a>
-
-    <nav class="site-nav" id="site-nav" aria-label="Päävalikko">
-      <ul>
-        <li><a href="index.html" aria-current="page" data-fi="Etusivu" data-en="Home" data-sv="Hem">Etusivu</a></li>
-        <li><a href="tarina.html" data-fi="Tarinamme" data-en="Our Story" data-sv="Vår historia">Tarinamme</a></li>
-        <li><a href="tuotteet.html" data-fi="Hunajamme" data-en="Our Honey" data-sv="Vår honung">Hunajamme</a></li>
-        <li><a href="yhteystiedot.html" data-fi="Yhteystiedot" data-en="Contact" data-sv="Kontakt">Yhteystiedot</a></li>
-      </ul>
-      <div class="header-actions">
-        <div class="lang-toggle" role="group" aria-label="Kieli / Language">
-          <button class="lang-btn active" data-lang="fi" aria-pressed="true">FI</button>
-          <button class="lang-btn" data-lang="en" aria-pressed="false">EN</button>
-          <button class="lang-btn" data-lang="sv" aria-pressed="false">SV</button>
-        </div>
-        <a class="icon-link" href="https://www.facebook.com/hunajaa.latvamantila" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg viewBox="0 0 24 24"><path d="M13.5 21v-7.2h2.4l.4-2.9h-2.8V9c0-.85.24-1.43 1.46-1.43H16.4V5.02C16.1 4.98 15.1 4.9 13.94 4.9c-2.37 0-4 1.44-4 4.1v2.9H7.5v2.9h2.44V21h3.56Z" fill="currentColor" stroke="none"/></svg>
-        </a>
-      </div>
-    </nav>
-
-    <button class="nav-toggle" aria-label="Valikko" aria-expanded="false" aria-controls="site-nav">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-    </button>
   </div>
-</header>
+  <div class="hero-scroll">
+    <span class="fi-i">Vieritä</span><span class="sv-i">Rulla</span><span class="en-i">Scroll</span>
+  </div>
+</section>
 
-<main id="main">
-
-  <section class="hero">
-    <div class="hero-media">
-      <img src="images/hero-beekeeper.jpg" alt="Mehiläishoitaja suojapuvussa tarkastamassa pesää kukkivalla niityllä" loading="eager" onerror="this.parentElement.innerHTML='<div class=&quot;ph&quot; style=&quot;aspect-ratio:auto;height:100%;border-radius:0;border:none;&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/><path d=&quot;M8 13c1 2 2.5 3 4 3s3-1 4-3&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-    </div>
-    <div class="container hero-content">
-      <p class="eyebrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v20M5 7l7-5 7 5M5 17l7 5 7-5"/></svg>
-        <span data-fi="Jalasjärven Keskikylä · Kurikka" data-en="Keskikylä, Jalasjärvi · Kurikka, Finland" data-sv="Keskikylä, Jalasjärvi · Kurikka">Jalasjärven Keskikylä · Kurikka</span>
-      </p>
-      <h1 data-fi="Tällä tilalla on tehty hunajaa jo sata vuotta" data-en="Honey this farm has made for a hundred years" data-sv="Honung som denna gård har gjort i hundra år">Tällä tilalla on tehty hunajaa jo sata vuotta</h1>
-      <p class="hero-lede" data-fi="Latva-Mantilan hunajatilalla mehiläiset kiertävät Jalasjärven Keskikylän pellot ja niityt kukasta kukkaan, ja tulos on täyteläistä, aitoa monikukkahunajaa suoraan tilalta." data-en="At Latva-Mantilan hunajatila the bees travel from flower to flower across the fields and meadows of Keskikylä, Jalasjärvi, and the result is rich, genuine multiflower honey straight from the farm." data-sv="På Latva-Mantilan hunajatila flyger bina från blomma till blomma över åkrarna och ängarna i Keskikylä, Jalasjärvi, och resultatet är fyllig, äkta blomsterhonung direkt från gården.">Latva-Mantilan hunajatilalla mehiläiset kiertävät Jalasjärven Keskikylän pellot ja niityt kukasta kukkaan, ja tulos on täyteläistä, aitoa monikukkahunajaa suoraan tilalta.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="tuotteet.html" data-fi="Tutustu hunajaamme" data-en="Discover our honey" data-sv="Upptäck vår honung">Tutustu hunajaamme</a>
-        <a class="btn btn-ghost" href="yhteystiedot.html" data-fi="Ota yhteyttä" data-en="Get in touch" data-sv="Kontakta oss">Ota yhteyttä</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="container">
-    <div class="facts-strip reveal">
-      <div class="fact-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.5 6l2 2M17.5 16l2 2M3 12h3M18 12h3M4.5 18l2-2M17.5 8l2-2"/><circle cx="12" cy="12" r="4"/></svg>
-        <span><strong data-fi="Lähes sata vuotta perinnettä" data-en="Nearly a century of tradition" data-sv="Nästan hundra år av tradition">Lähes sata vuotta perinnettä</strong><span data-fi="Hunajaa on tuotettu samalla tilalla polvesta toiseen" data-en="Honey has been produced on the same farm for generations" data-sv="Honung har producerats på samma gård i generationer">Hunajaa on tuotettu samalla tilalla polvesta toiseen</span></span>
-      </div>
-      <div class="fact-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8v8l8 5 8-5V8Z"/><path d="M12 3v18M4 8l8 5 8-5"/></svg>
-        <span><strong data-fi="Monikukkahunajaa" data-en="Multiflower honey" data-sv="Blomsterhonung">Monikukkahunajaa</strong><span data-fi="Kerätty Keskikylän pelloilta ja niityiltä" data-en="Gathered from the fields and meadows of Keskikylä" data-sv="Insamlad från Keskikyläs åkrar och ängar">Kerätty Keskikylän pelloilta ja niityiltä</span></span>
-      </div>
-      <div class="fact-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
-        <span><strong data-fi="Janne ja Katja Latva-Mantila" data-en="Janne and Katja Latva-Mantila" data-sv="Janne och Katja Latva-Mantila">Janne ja Katja Latva-Mantila</strong><span data-fi="Perhetila Jalasjärven Keskikylässä" data-en="A family farm in Keskikylä, Jalasjärvi" data-sv="En familjegård i Keskikylä, Jalasjärvi">Perhetila Jalasjärven Keskikylässä</span></span>
-      </div>
-      <div class="fact-pill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3c0 1.1-.9 2-2 2C10.5 19.5 4.5 13.5 4.5 6c0-1.1.9-2 2-2Z"/></svg>
-        <span><strong data-fi="Myynti suoraan tilalta" data-en="Sold straight from the farm" data-sv="Försäljning direkt från gården">Myynti suoraan tilalta</strong><span data-fi="Sekä lähialueen kauppoihin toimitettuna" data-en="And delivered to local shops" data-sv="Och levererad till lokala butiker">Sekä lähialueen kauppoihin toimitettuna</span></span>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container split reveal">
-      <div class="split-media">
-        <img src="images/bee-dandelion.jpg" alt="Mehiläinen keräämässä siitepölyä voikukasta" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;ph&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/><path d=&quot;M8 13c1 2 2.5 3 4 3s3-1 4-3&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-      </div>
-      <div class="split-body">
-        <p class="eyebrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9h12v-9"/></svg>
-          <span data-fi="Tilamme" data-en="About the farm" data-sv="Om gården">Tilamme</span>
-        </p>
-        <h2 data-fi="Elämää Latva-Mantilan hunajatilalla" data-en="Life at Latva-Mantilan hunajatila" data-sv="Livet på Latva-Mantilan hunajatila">Elämää Latva-Mantilan hunajatilalla</h2>
-        <p data-fi="Jalasjärven Keskikylässä, Kurikassa, Janne ja Katja Latva-Mantila jatkavat perheensä lähes satavuotista mehiläistarhausperinnettä. Pesät sijaitsevat ympäröivien peltojen ja niittyjen keskellä, ja mehiläiset saavat kerätä mettä vapaasti läpi kesän, ja tuloksena on täyteläistä, puhdasta monikukkahunajaa." data-en="In Keskikylä, Jalasjärvi, part of Kurikka, Janne and Katja Latva-Mantila continue their family's beekeeping tradition of nearly a hundred years. The hives sit among the surrounding fields and meadows, and the bees are left to forage freely all summer, giving a rich, pure multiflower honey." data-sv="I Keskikylä, Jalasjärvi, en del av Kurikka, fortsätter Janne och Katja Latva-Mantila familjens biodlingstradition som sträcker sig nästan hundra år tillbaka. Bikuporna står bland de omgivande åkrarna och ängarna, och bina får samla nektar fritt hela sommaren, vilket ger en fyllig, ren blomsterhonung.">Jalasjärven Keskikylässä, Kurikassa, Janne ja Katja Latva-Mantila jatkavat perheensä lähes satavuotista mehiläistarhausperinnettä. Pesät sijaitsevat ympäröivien peltojen ja niittyjen keskellä, ja mehiläiset saavat kerätä mettä vapaasti läpi kesän, ja tuloksena on täyteläistä, puhdasta monikukkahunajaa.</p>
-        <ul class="checklist">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Perheen hoitama tila jo useamman sukupolven ajan" data-en="Family run for several generations" data-sv="Familjedriven i flera generationer">Perheen hoitama tila jo useamman sukupolven ajan</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Mehiläiset keräävät mettä ympäröiviltä pelloilta ja niityiltä" data-en="Bees forage across the surrounding fields and meadows" data-sv="Bina samlar nektar från omgivande åkrar och ängar">Mehiläiset keräävät mettä ympäröiviltä pelloilta ja niityiltä</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Hunaja myydään suoraan tilalta sopimuksen mukaan" data-en="Honey is sold directly from the farm by appointment" data-sv="Honungen säljs direkt från gården efter överenskommelse">Hunaja myydään suoraan tilalta sopimuksen mukaan</span></li>
-        </ul>
-        <div class="hero-actions" style="margin-top:1.5rem;">
-          <a class="btn btn-outline" href="tarina.html" data-fi="Lue koko tarinamme" data-en="Read our full story" data-sv="Läs hela vår historia">Lue koko tarinamme</a>
+<!-- HERITAGE STRIP -->
+<section id="vuosirengas">
+  <div class="container">
+    <div class="vuosirengas-inner">
+      <div class="stamp-hex">
+        <div class="stamp-hex-inner">
+          <div class="stamp-year">~100</div>
+          <div class="stamp-sub">
+            <span class="fi-i">vuotta</span>
+            <span class="sv-i">år</span>
+            <span class="en-i">years</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="honey-band">
-    <div class="container split reverse reveal">
-      <div class="split-media">
-        <img src="images/bee-blue-flowers.jpg" alt="Mehiläinen siniraittojen kukilla keväällä" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;ph&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><path d=&quot;M12 3c2 3 4 5 4 8a4 4 0 1 1-8 0c0-3 2-5 4-8Z&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-      </div>
-      <div class="split-body">
-        <p class="eyebrow" data-fi="Monikukkahunaja" data-en="Multiflower honey" data-sv="Blomsterhonung">Monikukkahunaja</p>
-        <h2 data-fi="Ei kahta samanlaista kesää, ei kahta samanlaista purkkia" data-en="No two summers make the same jar" data-sv="Ingen sommar ger samma burk">Ei kahta samanlaista kesää, ei kahta samanlaista purkkia</h2>
-        <p data-fi="Koska mehiläiset saavat valita kukkansa vapaasti, jokaisen kesän sato kertoo omanlaisensa tarinan: väri, maku ja koostumus vaihtelevat sen mukaan, mikä kukkii milloinkin Keskikylän mailla. Hunaja lingotaan ja pakataan tilalla, ilman turhia lisäyksiä." data-en="Because the bees choose their own flowers, each summer's harvest tells its own story: the color, taste and texture shift with whatever is blooming across Keskikylä. The honey is extracted and packed on the farm, with nothing added." data-sv="Eftersom bina själv väljer sina blommor berättar varje sommars skörd sin egen historia: färg, smak och konsistens varierar med det som blommar i Keskikylä. Honungen slungas och förpackas på gården, helt utan tillsatser.">Koska mehiläiset saavat valita kukkansa vapaasti, jokaisen kesän sato kertoo omanlaisensa tarinan: väri, maku ja koostumus vaihtelevat sen mukaan, mikä kukkii milloinkin Keskikylän mailla. Hunaja lingotaan ja pakataan tilalla, ilman turhia lisäyksiä.</p>
-        <ul class="checklist">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Lingottu ja pakattu tilalla" data-en="Extracted and packed on the farm" data-sv="Slungad och förpackad på gården">Lingottu ja pakattu tilalla</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Ei lisättyjä aineita" data-en="Nothing added" data-sv="Inga tillsatser">Ei lisättyjä aineita</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 9.5 17 19 6.5"/></svg><span data-fi="Toimitetaan myös lähialueen kauppoihin" data-en="Also delivered to shops nearby" data-sv="Levereras även till närliggande butiker">Toimitetaan myös lähialueen kauppoihin</span></li>
-        </ul>
-        <div class="hero-actions" style="margin-top:1.5rem;">
-          <a class="btn btn-primary" href="tuotteet.html" data-fi="Näytä hunajamme" data-en="See our honey" data-sv="Se vår honung">Näytä hunajamme</a>
+      <div class="heritage-facts">
+        <div class="heritage-fact">
+          <div class="fact-num">1920</div>
+          <div class="fact-text">
+            <strong class="fi">Perinne alkaa</strong>
+            <strong class="sv">Traditionen börjar</strong>
+            <strong class="en">Tradition begins</strong>
+            <span class="fi-i">Mehiläishoito aloitettiin Latva-Mantilan tilalla Jalasjärven Keskikylässä lähes sata vuotta sitten. Sama paikka, sama käsityö.</span>
+            <span class="sv-i">Biodling startades på Latva-Mantila gård i Jalasjärvi för snart ett sekel sedan. Samma plats, samma hantverk.</span>
+            <span class="en-i">Beekeeping began at Latva-Mantila farm in Jalasjärvi nearly a century ago. Same place, same craft.</span>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container">
-      <div class="section-head center reveal">
-        <p class="eyebrow" data-fi="Kuvia tilalta" data-en="From the farm" data-sv="Bilder från gården">Kuvia tilalta</p>
-        <h2 data-fi="Kesä Keskikylän pelloilla" data-en="Summer in the fields of Keskikylä" data-sv="Sommar på Keskikyläs åkrar">Kesä Keskikylän pelloilla</h2>
-      </div>
-      <div class="gallery-grid reveal">
-        <a href="tuotteet.html" style="position:relative;grid-column:span 2;">
-          <img src="images/hero-beekeeper.jpg" alt="Mehiläishoitaja kukkaniityllä" loading="lazy" onerror="this.parentElement.outerHTML='<div class=&quot;ph&quot; style=&quot;aspect-ratio:1;&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-        </a>
-        <a href="tarina.html" style="position:relative;">
-          <img src="images/bee-white-flower.jpg" alt="Mehiläinen valkoisella kukalla" loading="lazy" onerror="this.parentElement.outerHTML='<div class=&quot;ph&quot; style=&quot;aspect-ratio:1;&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-        </a>
-        <a href="yhteystiedot.html" style="position:relative;">
-          <img src="images/rustic-flowers-plate.jpg" alt="Niittykukkia lautasella tilan pihapöydällä" loading="lazy" onerror="this.parentElement.outerHTML='<div class=&quot;ph&quot; style=&quot;aspect-ratio:1;&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.5&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;9&quot;/></svg><span class=&quot;ph-tag&quot;>Kuva tulossa</span></div>'">
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="container">
-      <div class="cta-band reveal">
-        <div>
-          <h2 data-fi="Kiinnostuitko hunajastamme?" data-en="Interested in our honey?" data-sv="Intresserad av vår honung?">Kiinnostuitko hunajastamme?</h2>
-          <p data-fi="Sovi hunajan nouto puhelimitse tai lähetä viesti lomakkeella, niin järjestetään ajankohta." data-en="Arrange to pick up honey by phone, or send a message through our form and we will find a time." data-sv="Boka hämtning av honung per telefon, eller skicka ett meddelande via formuläret så hittar vi en tid.">Sovi hunajan nouto puhelimitse tai lähetä viesti lomakkeella, niin järjestetään ajankohta.</p>
+        <div class="heritage-fact">
+          <div class="fact-num">Nyt</div>
+          <div class="fact-text">
+            <strong class="fi">Janne ja Katja jatkavat</strong>
+            <strong class="sv">Janne och Katja fortsätter</strong>
+            <strong class="en">Janne and Katja carry it on</strong>
+            <span class="fi-i">Sama tila, sama kärsivallinen käsityö, sama aito hunaja. Perinne elää.</span>
+            <span class="sv-i">Samma gård, samma tålmodiga hantverk, samma äkta honung. Traditionen lever.</span>
+            <span class="en-i">Same farm, same patient craft, same genuine honey. The tradition lives on.</span>
+          </div>
         </div>
-        <div class="cta-actions">
-          <a class="btn btn-primary" href="tel:+358503087268">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 4h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3c0 1.1-.9 2-2 2C10.5 19.5 4.5 13.5 4.5 6c0-1.1.9-2 2-2Z"/></svg>
-            050 308 7268
-          </a>
-          <a class="btn btn-ghost" href="yhteystiedot.html" data-fi="Kaikki yhteystiedot" data-en="All contact details" data-sv="Alla kontaktuppgifter">Kaikki yhteystiedot</a>
-        </div>
+        <div class="ornament">◆ &nbsp; ◆ &nbsp; ◆</div>
       </div>
-    </div>
-  </section>
-
-</main>
-
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      <div class="footer-brand">
-        <span class="brand-mark" aria-hidden="true"><img src="images/logo-mark.svg" alt="" width="44" height="44"></span>
-        <strong>Latva-Mantilan hunajatila</strong>
-      </div>
-      <p data-fi="Aitoa monikukkahunajaa Jalasjärven Keskikylästä, Kurikasta. Perheen hunajatila jo lähes sadan vuoden ajan." data-en="Genuine multiflower honey from Keskikylä, Jalasjärvi, part of Kurikka. A family honey farm for nearly a hundred years." data-sv="Äkta blomsterhonung från Keskikylä, Jalasjärvi, en del av Kurikka. En familjs honungsgård i nästan hundra år.">Aitoa monikukkahunajaa Jalasjärven Keskikylästä, Kurikasta. Perheen hunajatila jo lähes sadan vuoden ajan.</p>
-      <div class="footer-social">
-        <a class="icon-link" href="https://www.facebook.com/hunajaa.latvamantila" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.2h2.4l.4-2.9h-2.8V9c0-.85.24-1.43 1.46-1.43H16.4V5.02C16.1 4.98 15.1 4.9 13.94 4.9c-2.37 0-4 1.44-4 4.1v2.9H7.5v2.9h2.44V21h3.56Z" fill="currentColor" stroke="none"/></svg></a>
-      </div>
-    </div>
-    <div>
-      <h4 data-fi="Sivukartta" data-en="Sitemap" data-sv="Sidkarta">Sivukartta</h4>
-      <ul>
-        <li><a href="index.html" data-fi="Etusivu" data-en="Home" data-sv="Hem">Etusivu</a></li>
-        <li><a href="tarina.html" data-fi="Tarinamme" data-en="Our Story" data-sv="Vår historia">Tarinamme</a></li>
-        <li><a href="tuotteet.html" data-fi="Hunajamme" data-en="Our Honey" data-sv="Vår honung">Hunajamme</a></li>
-        <li><a href="yhteystiedot.html" data-fi="Yhteystiedot" data-en="Contact" data-sv="Kontakt">Yhteystiedot</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4 data-fi="Yhteystiedot" data-en="Contact" data-sv="Kontakt">Yhteystiedot</h4>
-      <ul>
-        <li><a href="tel:+358503087268">050 308 7268</a></li>
-        <li><span data-fi="Mantilanmäentie 41, 61680 Mantila" data-en="Mantilanmäentie 41, 61680 Mantila, Finland" data-sv="Mantilanmäentie 41, 61680 Mantila">Mantilanmäentie 41, 61680 Mantila</span></li>
-        <li><span data-fi="Avoinna sopimuksen mukaan" data-en="Open by appointment" data-sv="Öppet efter överenskommelse">Avoinna sopimuksen mukaan</span></li>
-      </ul>
     </div>
   </div>
-  <div class="container footer-bottom">
-    <span>&copy; 2026 Latva-Mantilan hunajatila</span>
-    <span data-fi="Jalasjärvi, Kurikka · Suomi" data-en="Jalasjärvi, Kurikka · Finland" data-sv="Jalasjärvi, Kurikka · Finland">Jalasjärvi, Kurikka · Suomi</span>
+</section>
+
+<!-- TARINA -->
+<section id="tarina">
+  <div class="container">
+    <div class="tarina-grid fade-up">
+      <div class="tarina-img-wrap">
+        <img class="tarina-img" src="images/bee-dandelion.jpg" alt="Mehiläinen voikukassa" onerror="this.style.display='none'">
+      </div>
+      <div class="tarina-text">
+        <div class="section-rule"></div>
+        <div class="section-label">
+          <span class="fi-i">Meidän tarinamme</span>
+          <span class="sv-i">Vår historia</span>
+          <span class="en-i">Our story</span>
+        </div>
+        <h2 class="section-title">
+          <span class="fi">Mehiläishoitajan käsityö</span>
+          <span class="sv">Biodlarens hantverk</span>
+          <span class="en">The beekeeper's craft</span>
+        </h2>
+        <div class="tarina-body">
+          <div class="fi">
+            <p>Latva-Mantilan hunajatila on pohjalaiseen maisemaan juurtunut perhetila, jonka mehiläishoito ulottuu lähes sadan vuoden taakse. Samalla peltomaisemalla, samojen metsien kukkapölyn täyttämässä ilmassa, on tehty hunajaa sukupolvelta toiselle.</p>
+            <p>Janne ja Katja Latva-Mantila hoitavat pesänsä perinteisellä huolella. Mehiläiset pääsevät lentää pohjalaisilla niityillä ja metsissä, keräten nektaria apilasta, voikukasta ja muista luonnonkukista. Tuloksena on aitoa monikukkahunajaa, jossa maistuu Etelä-Pohjanmaan luonto.</p>
+            <blockquote class="tarina-quote">"Hunaja on luonnon oma ihme. Mehiläiset tekevät työn, me autamme heitä parhaalla mahdollisella tavalla."</blockquote>
+          </div>
+          <div class="sv">
+            <p>Latva-Mantila bigård är en familjegård rotad i det österbottniska landskapet, vars biodling sträcker sig nästan ett sekel tillbaka i tiden. I samma äng, i luften fylld av pollen från samma skogar, har man gjort honung från generation till generation.</p>
+            <p>Janne och Katja Latva-Mantila sköter sina kupor med traditionell omsorg. Bina flyger fritt över österbottniska ängar och skogar, samlar nektar från klöver, maskros och vilda blommor. Resultatet är äkta blomsterhonung med smak av Södra Österbottens natur.</p>
+            <blockquote class="tarina-quote">"Honung är naturens eget mirakel. Bina gör jobbet, vi hjälper dem på bästa möjliga sätt."</blockquote>
+          </div>
+          <div class="en">
+            <p>Latva-Mantila honey farm is a family holding rooted in the Ostrobothnian landscape, with beekeeping traditions stretching back nearly a century. On the same fields, in the air filled with pollen from the same forests, honey has been made from generation to generation.</p>
+            <p>Janne and Katja Latva-Mantila tend their hives with traditional care. The bees range freely across Ostrobothnian meadows and forests, gathering nectar from clover, dandelion, and wild flowers. The result is genuine multi-flower honey with the taste of South Ostrobothnia's nature.</p>
+            <blockquote class="tarina-quote">"Honey is nature's own miracle. The bees do the work; we help them in the best way we can."</blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="container footer-credit">
-    <span class="demo-badge">DEMO</span>
-    <span data-fi="Sivuston on suunnitellut ja toteuttanut Anton Jalonen. Tämä on demoversio, kunnes sivusto otetaan viralliseen käyttöön." data-en="Website designed and built by Anton Jalonen. This is a demo version until the site is purchased and taken into use." data-sv="Webbplatsen är designad och utvecklad av Anton Jalonen. Detta är en demoversion tills webbplatsen tas i officiellt bruk.">Sivuston on suunnitellut ja toteuttanut Anton Jalonen. Tämä on demoversio, kunnes sivusto otetaan viralliseen käyttöön.</span>
+</section>
+
+<!-- MEHILAINEN VUOSI (Signature component: beekeeper's calendar) -->
+<section id="mehilainen-vuosi">
+  <div class="container section-pad">
+    <div class="section-label">
+      <span class="fi-i">Mehiläistarhuruksen vuosikierto</span>
+      <span class="sv-i">Biodlarens årsrytm</span>
+      <span class="en-i">The beekeeper's year</span>
+    </div>
+    <h2 class="section-title">
+      <span class="fi">Vuosi mehiläispesässä</span>
+      <span class="sv">Ett år i kupan</span>
+      <span class="en">A year in the hive</span>
+    </h2>
+    <div class="vuosi-grid fade-up">
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Tammikuu</span><span class="sv-i">Januari</span><span class="en-i">January</span></div><div class="vuosi-icon">❄</div><div class="vuosi-desc fi">Pesä talviunessa. Mehiläiset muodostavat tiiviin pallon pitääkseen lämmön.</div><div class="vuosi-desc sv">Kupan vilar. Bina bildar en tät kluster för att hålla värmen.</div><div class="vuosi-desc en">Hive at rest. Bees form a tight winter cluster to maintain warmth.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Helmikuu</span><span class="sv-i">Februari</span><span class="en-i">February</span></div><div class="vuosi-icon">🌱</div><div class="vuosi-desc fi">Kuningatar alkaa munia. Yhdyskunta valmistautuu kevääseen.</div><div class="vuosi-desc sv">Drottningen börjar lägga ägg. Samhället förbereder sig för våren.</div><div class="vuosi-desc en">The queen begins laying. The colony prepares for spring.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Maaliskuu</span><span class="sv-i">Mars</span><span class="en-i">March</span></div><div class="vuosi-icon">☀</div><div class="vuosi-desc fi">Ensimmäiset puhdistuslennot. Mehiläishoitaja tarkistaa varastot.</div><div class="vuosi-desc sv">Första rensningsflygningarna. Biodlaren kontrollerar förråden.</div><div class="vuosi-desc en">First cleansing flights. The beekeeper checks winter stores.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Huhtikuu</span><span class="sv-i">April</span><span class="en-i">April</span></div><div class="vuosi-icon">🌼</div><div class="vuosi-desc fi">Voikukka kukkii. Ensimmäinen keväthoito ja pesien tarkastus.</div><div class="vuosi-desc sv">Maskrosen blommar. Första vårskötsel och inspektion av kuporna.</div><div class="vuosi-desc en">Dandelion blooms. First spring care and hive inspection.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Toukokuu</span><span class="sv-i">Maj</span><span class="en-i">May</span></div><div class="vuosi-icon">🍀</div><div class="vuosi-desc fi">Nektarivuon huippu. Apila ja hedelmäpuut kukkivat.</div><div class="vuosi-desc sv">Nektarflödets höjdpunkt. Klöver och fruktträd blommar.</div><div class="vuosi-desc en">Peak nectar flow. Clover and fruit trees bloom.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Kesäkuu</span><span class="sv-i">Juni</span><span class="en-i">June</span></div><div class="vuosi-icon">🐝</div><div class="vuosi-desc fi">Lentavien mehiläisten parvi saattaa lähteä. Tarkkailua ja hoitoa.</div><div class="vuosi-desc sv">Svärming möjlig. Noga övervakning och kupskötsel.</div><div class="vuosi-desc en">Swarms may issue. Close monitoring and hive management.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Heinäkuu</span><span class="sv-i">Juli</span><span class="en-i">July</span></div><div class="vuosi-icon">🌿</div><div class="vuosi-desc fi">Heinäkuun hunajavuo. Niittykasvit kerätty täysimääräisesti.</div><div class="vuosi-desc sv">Juli-nektarflöde. Ängsblommor samlas in till fullo.</div><div class="vuosi-desc en">July nectar flow. Meadow wildflowers gathered in full.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Elokuu</span><span class="sv-i">Augusti</span><span class="en-i">August</span></div><div class="vuosi-icon">🍯</div><div class="vuosi-desc fi">Sadonkorjuu. Hunajakennot poistetaan, hunaja lingotaan ja suodatetaan.</div><div class="vuosi-desc sv">Skörd. Honungskakorna tas ut, slungas och filtreras.</div><div class="vuosi-desc en">Harvest. Honey frames are removed, extracted and filtered.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Syyskuu</span><span class="sv-i">September</span><span class="en-i">September</span></div><div class="vuosi-icon">🍂</div><div class="vuosi-desc fi">Varroakäsittely. Talventarjokkaat vahvistetaan pesille.</div><div class="vuosi-desc sv">Varroabehandling. Vinterförråden stärks inför vintern.</div><div class="vuosi-desc en">Varroa treatment. Winter stores built up for the cold season.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Lokakuu</span><span class="sv-i">Oktober</span><span class="en-i">October</span></div><div class="vuosi-icon">🍁</div><div class="vuosi-desc fi">Pesät suljetaan talvehtimista varten. Hiirien suojaus asennetaan.</div><div class="vuosi-desc sv">Kuporna stängs för övervintring. Musguard installeras.</div><div class="vuosi-desc en">Hives sealed for winter. Mouse guards installed.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Marraskuu</span><span class="sv-i">November</span><span class="en-i">November</span></div><div class="vuosi-icon">🌙</div><div class="vuosi-desc fi">Mehiläishoitaja suunnittelee ensi vuotta. Hunaja pullotetaan talven myyntiä varten.</div><div class="vuosi-desc sv">Biodlaren planerar nästa år. Honung buteljeras för vinterthörsäljning.</div><div class="vuosi-desc en">Beekeeper plans for next year. Honey is bottled for winter sales.</div></div>
+      <div class="vuosi-card"><div class="vuosi-month"><span class="fi-i">Joulukuu</span><span class="sv-i">December</span><span class="en-i">December</span></div><div class="vuosi-icon">✨</div><div class="vuosi-desc fi">Joulun aikaan hunaja löytää tiensä lahjaksi ja herkkupöytään.</div><div class="vuosi-desc sv">Till julen hittar honungen sin väg som gåva och till godsaksbordet.</div><div class="vuosi-desc en">At Christmas, the honey finds its way as a gift and to the festive table.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TUOTTEET -->
+<section id="tuotteet">
+  <div class="container section-pad">
+    <div class="section-rule"></div>
+    <div class="section-label">
+      <span class="fi-i">Tuotteemme</span>
+      <span class="sv-i">Våra produkter</span>
+      <span class="en-i">Our products</span>
+    </div>
+    <h2 class="section-title">
+      <span class="fi">Puhdas monikukkahunaja</span>
+      <span class="sv">Ren blomsterhonung</span>
+      <span class="en">Pure multi-flower honey</span>
+    </h2>
+    <div class="fi section-lead">Jokainen purkki sisältää palan pohjalaisesta luonnosta, kerätty kärsivällisesti pesältä purkkiin.</div>
+    <div class="sv section-lead">Varje burk innehåller ett stycke österbottnisk natur, samlad med tålamod från bikupa till burk.</div>
+    <div class="en section-lead">Every jar contains a piece of Ostrobothnian nature, gathered patiently from hive to shelf.</div>
+    <div class="tuotteet-grid fade-up">
+      <div class="tuote-card">
+        <div class="tuote-icon">🍯</div>
+        <div class="tuote-name"><span class="fi-i">Kesän monikukkahunaja</span><span class="sv-i">Sommarblomsterhonung</span><span class="en-i">Summer multi-flower honey</span></div>
+        <div class="tuote-desc fi">Aitojen pohjalaisniittyjen kukkaishunajoista koottu, kevyt ja aromaattinen hunaja. Täydellinen leivän päälle tai teeveteen.</div>
+        <div class="tuote-desc sv">Samlad från äkta österbottniska ängsblommor, en lätt och aromatisk honung. Perfekt på bröd eller i te.</div>
+        <div class="tuote-desc en">Gathered from genuine Ostrobothnian meadow flowers, light and aromatic honey. Perfect on bread or in tea.</div>
+        <div class="tuote-tag"><span class="fi-i">Kotimainen luonnontuote</span><span class="sv-i">Inhemskt naturprodukt</span><span class="en-i">Domestic natural product</span></div>
+      </div>
+      <div class="tuote-card">
+        <div class="tuote-icon">🌿</div>
+        <div class="tuote-name"><span class="fi-i">Apila-metsähunaja</span><span class="sv-i">Klöver-skoghonung</span><span class="en-i">Clover and forest honey</span></div>
+        <div class="tuote-desc fi">Punaapila ja valkoapila yhdistyvät metsän villikukkiin. Makea, syvä aromi. Löydät sen usein kiteytyneen muodossa.</div>
+        <div class="tuote-desc sv">Rödklöver och vitklöver blandas med skogens vilda blommor. Söt, djup arom. Hittas ofta i kristalliserad form.</div>
+        <div class="tuote-desc en">Red and white clover combined with wild forest flowers. Sweet, deep aroma. Often found in crystallised form.</div>
+        <div class="tuote-tag"><span class="fi-i">Suoramyynti tilalta</span><span class="sv-i">Direktförsäljning från gården</span><span class="en-i">Direct farm sale</span></div>
+      </div>
+      <div class="tuote-card">
+        <div class="tuote-icon">🏪</div>
+        <div class="tuote-name"><span class="fi-i">Lähialueen kaupat</span><span class="sv-i">Butiker i närheten</span><span class="en-i">Local stockists</span></div>
+        <div class="tuote-desc fi">Latva-Mantilan hunajaa myydään myös lähialueen kaupoissa. Kysy omalta lähikaupaltasi saatavuudesta.</div>
+        <div class="tuote-desc sv">Latva-Mantilas honung säljs även i butiker i närområdet. Fråga din närmaste butik om tillgänglighet.</div>
+        <div class="tuote-desc en">Latva-Mantila honey is also stocked in local shops in the area. Ask your nearest store for availability.</div>
+        <div class="tuote-tag"><span class="fi-i">Saatavilla lähikaupoissa</span><span class="sv-i">Tillgänglig i lokala butiker</span><span class="en-i">Available locally</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERIA -->
+<section id="galleria">
+  <div class="container section-pad">
+    <div class="section-rule"></div>
+    <div class="section-label"><span class="fi-i">Tilalta</span><span class="sv-i">Från gården</span><span class="en-i">From the farm</span></div>
+    <h2 class="section-title"><span class="fi">Mehiläisten maailma</span><span class="sv">Bikornas värld</span><span class="en">The world of bees</span></h2>
+    <div class="galleria-grid fade-up">
+      <div class="gal-cell"><img src="images/bee-blue-flowers.jpg" alt="Mehiläinen sinisillä kukilla" onerror="this.style.display='none'"></div>
+      <div class="gal-cell"><img src="images/bee-white-flower.jpg" alt="Mehiläinen valkoisella kukalla" onerror="this.style.display='none'"></div>
+      <div class="gal-cell"><img src="images/logo.jpg" alt="Latva-Mantilan hunajatila" style="object-position:top" onerror="this.style.display='none'"></div>
+      <div class="gal-cell"><img src="images/rustic-flowers-plate.jpg" alt="Kukka-asetelma lautasella" onerror="this.style.display='none'"></div>
+    </div>
+  </div>
+</section>
+
+<!-- YHTEYSTIEDOT -->
+<section id="yhteystiedot">
+  <div class="container section-pad">
+    <div class="section-label"><span class="fi-i">Yhteystiedot</span><span class="sv-i">Kontakt</span><span class="en-i">Contact</span></div>
+    <h2 class="section-title"><span class="fi">Ota yhteyttä tai tilaa hunajaa</span><span class="sv">Kontakta oss eller beställ honung</span><span class="en">Get in touch or order honey</span></h2>
+    <div class="contact-inner">
+      <div class="contact-info">
+        <h3><span class="fi-i">Latva-Mantilan hunajatila</span><span class="sv-i">Latva-Mantila bigård</span><span class="en-i">Latva-Mantila honey farm</span></h3>
+        <div class="contact-row">
+          <span class="contact-icon">📍</span>
+          <div class="contact-detail">
+            <strong><span class="fi-i">Osoite</span><span class="sv-i">Adress</span><span class="en-i">Address</span></strong>
+            Mantilanmäentie 41<br>61680 Mantila, Jalasjärvi
+          </div>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">📞</span>
+          <div class="contact-detail">
+            <strong><span class="fi-i">Puhelin</span><span class="sv-i">Telefon</span><span class="en-i">Phone</span></strong>
+            <a href="tel:+358503087268">050 3087268</a>
+          </div>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">📘</span>
+          <div class="contact-detail">
+            <strong>Facebook</strong>
+            <a href="https://www.facebook.com/hunajaa.latvamantila/" target="_blank" rel="noopener">hunajaa.latvamantila</a>
+          </div>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">🕐</span>
+          <div class="contact-detail">
+            <strong><span class="fi-i">Aukioloajat</span><span class="sv-i">Öppettider</span><span class="en-i">Opening hours</span></strong>
+            <span class="fi-i">Sopimuksen mukaan — soita ensin!</span>
+            <span class="sv-i">Enligt avtal — ring oss först!</span>
+            <span class="en-i">By appointment — please call first!</span>
+          </div>
+        </div>
+      </div>
+      <div class="order-panel">
+        <h3><span class="fi-i">Tilaa hunajaa</span><span class="sv-i">Beställ honung</span><span class="en-i">Order honey</span></h3>
+        <p class="fi">Toimitamme hunajaa suoraan tilalta. Soita tai ota yhteyttä Facebookin kautta ja kerro minkä verran tarvitset. Toimitus lähialueen kauppoihin onnistuu myös.</p>
+        <p class="sv">Vi levererar honung direkt från gården. Ring eller kontakta oss via Facebook och berätta hur mycket du behöver. Leverans till butiker i närheten fungerar också.</p>
+        <p class="en">We deliver honey directly from the farm. Call or contact us via Facebook and tell us how much you need. Delivery to local shops is also available.</p>
+        <a href="tel:+358503087268" class="order-cta"><span class="fi-i">Soita tilaus</span><span class="sv-i">Ring och beställ</span><span class="en-i">Call to order</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">Latva-Mantilan hunajatila</div>
+    <div class="footer-div">◆ ◆ ◆ ◆ ◆</div>
+    <p>Mantilanmäentie 41, 61680 Mantila, Jalasjärvi &nbsp;|&nbsp; <a href="tel:+358503087268">050 3087268</a></p>
+    <p style="margin-top:0.4rem;"><a href="https://www.facebook.com/hunajaa.latvamantila/" target="_blank" rel="noopener">Facebook</a></p>
+    <div class="footer-div" style="margin-top:2rem;">◆ ◆ ◆</div>
+    <p style="font-size:0.68rem;opacity:0.4;margin-top:0.5rem;">
+      <span class="fi-i">Demo-sivusto &middot; Suunnitellut Anton Jalonen &middot; antonjalonen.fi</span>
+      <span class="sv-i">Demosida &middot; Designad av Anton Jalonen &middot; antonjalonen.fi</span>
+      <span class="en-i">Demo site &middot; Designed by Anton Jalonen &middot; antonjalonen.fi</span>
+    </p>
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script>
+function setLang(lang) {
+  document.body.dataset.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === lang);
+  });
+  const t = {
+    fi: 'Latva-Mantilan hunajatila · Aitoa monikukkahunajaa, Jalasjärvi',
+    sv: 'Latva-Mantila bigård · Äkta blomsterhonung, Jalasjärvi',
+    en: 'Latva-Mantila honey farm · Genuine multi-flower honey, Jalasjärvi'
+  };
+  document.title = t[lang] || t.fi;
+}
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60), {passive:true});
+const toggle = document.getElementById('navToggle');
+const mobile = document.getElementById('navMobile');
+toggle.addEventListener('click', () => mobile.classList.toggle('open'));
+function closeMobile() { mobile.classList.remove('open'); }
+const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), {threshold:0.1, rootMargin:'0px 0px -50px 0px'});
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+</script>
 </body>
 </html>
